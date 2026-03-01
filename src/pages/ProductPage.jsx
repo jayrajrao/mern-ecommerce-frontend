@@ -16,7 +16,10 @@ function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
-
+    const imageUrl =
+  product.images?.url ||
+  product.images?.[0]?.url ||
+  "/placeholder.png";
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -73,9 +76,9 @@ function ProductPage() {
       <div className="grid max-w-6xl gap-8 px-4 py-6 mx-auto md:grid-cols-2">
         {/* image */}
       <img
-  src={product.images?.url || "https://via.placeholder.com/400"}
+  src={imageUrl}
   alt={product.name}
-  className="w-full h-64 sm:h-80 md:h-[420px] object-cover rounded-2xl"
+  className="object-cover w-full h-48"
 />
 
         {/* info */}
