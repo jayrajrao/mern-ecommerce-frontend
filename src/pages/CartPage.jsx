@@ -47,7 +47,7 @@ function CartPage() {
               {/* ✅ image */}
               <img
                 src={
-                  product.images?.[0]?.url ||
+                product.images?.url||
                   "/placeholder.png"
                 }
                 alt={product.name || "Product"}

@@ -15,7 +15,7 @@ function ProductCard({ product }) {
       {/* image */}
       <div className="overflow-hidden">
         <img
-          src={product.images?.[0]?.url || "/placeholder.png"}
+         src={product.images?.url || "/placeholder.png"}
           alt={product.name}
           className="object-cover w-full h-48 transition-transform duration-300 group-hover:scale-105"
         />
