@@ -9,25 +9,25 @@ function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // ⭐ SINGLE clean hook
   const { addToCartOptimistic } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
-    const imageUrl =
-  product.images?.url ||
-  product.images?.[0]?.url ||
-  "/placeholder.png";
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        setLoading(true);
         const data = await getProductById(id);
-        setProduct(data);
+
+        // 🔥 IMPORTANT FIX
+        setProduct(data?.product || null);
       } catch (err) {
-        console.error(err);
+        console.error("FETCH PRODUCT ERROR:", err);
         toast.error("Failed to load product");
+        setProduct(null);
       } finally {
         setLoading(false);
       }
@@ -36,7 +36,13 @@ function ProductPage() {
     fetchProduct();
   }, [id]);
 
-  // ✅ Add to cart (OPTIMISTIC)
+  // ✅ SAFE image resolver (production ready)
+  const imageUrl =
+    product?.images?.url ??
+    product?.images?.[0]?.url ??
+    "/placeholder.png";
+
+  // ✅ Add to cart
   const handleAddToCart = async () => {
     if (!product) return;
 
@@ -52,7 +58,7 @@ function ProductPage() {
     }
   };
 
-  // ✅ Buy now (OPTIMISTIC)
+  // ✅ Buy now
   const handleBuyNow = async () => {
     if (!product) return;
 
@@ -75,11 +81,14 @@ function ProductPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="grid max-w-6xl gap-8 px-4 py-6 mx-auto md:grid-cols-2">
         {/* image */}
-      <img
-  src={imageUrl}
-  alt={product.name}
-  className="object-cover w-full h-48"
-/>
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="object-cover w-full h-48 rounded-xl"
+          onError={(e) => {
+            e.currentTarget.src = "/placeholder.png";
+          }}
+        />
 
         {/* info */}
         <div>
