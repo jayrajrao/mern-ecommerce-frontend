@@ -72,11 +72,11 @@ function ProductPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="grid max-w-6xl gap-8 px-4 py-6 mx-auto md:grid-cols-2">
         {/* image */}
-        <img
-          src={product.images?.[0]?.url || "https://via.placeholder.com/400"}
-          alt={product.name}
-          className="w-full h-64 sm:h-80 md:h-[420px] object-cover rounded-2xl"
-        />
+      <img
+  src={product.images?.url || "https://via.placeholder.com/400"}
+  alt={product.name}
+  className="w-full h-64 sm:h-80 md:h-[420px] object-cover rounded-2xl"
+/>
 
         {/* info */}
         <div>
