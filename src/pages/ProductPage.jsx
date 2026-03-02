@@ -21,8 +21,6 @@ function ProductPage() {
       try {
         setLoading(true);
         const data = await getProductById(id);
-
-        // ✅ correct shape
         setProduct(data?.product || null);
       } catch (err) {
         console.error("FETCH PRODUCT ERROR:", err);
@@ -36,18 +34,39 @@ function ProductPage() {
     fetchProduct();
   }, [id]);
 
-  // ✅ memoized safe image resolver (PRO)
+  // ✅ BULLETPROOF image resolver
   const imageUrl = useMemo(() => {
     if (!product) return "/placeholder.png";
 
-    return (
-      product?.images?.url ||
-      product?.images?.[0]?.url ||
-      "/placeholder.png"
-    );
+    const img = product.images;
+
+    // case 1: object
+    if (img && typeof img === "object" && img.url) {
+      return img.url;
+    }
+
+    // case 2: array
+    if (Array.isArray(img) && img[0]?.url) {
+      return img[0].url;
+    }
+
+    // case 3: string
+    if (typeof img === "string") {
+      return img;
+    }
+
+    return "/placeholder.png";
   }, [product]);
 
-  // ✅ qty handlers with stock guard
+  // 🔍 DEBUG (SAFE PLACE)
+  useEffect(() => {
+    if (product) {
+      console.log("🧪 PRODUCT:", product);
+      console.log("🧪 RESOLVED IMAGE URL:", imageUrl);
+    }
+  }, [product, imageUrl]);
+
+  // qty handlers
   const increaseQty = () => {
     if (!product) return;
     setQty((prev) => Math.min(product.stock || 10, prev + 1));
@@ -57,7 +76,7 @@ function ProductPage() {
     setQty((prev) => Math.max(1, prev - 1));
   };
 
-  // ✅ Add to cart
+  // Add to cart
   const handleAddToCart = async () => {
     if (!product) return;
 
@@ -73,7 +92,7 @@ function ProductPage() {
     }
   };
 
-  // ✅ Buy now
+  // Buy now
   const handleBuyNow = async () => {
     if (!product) return;
 
@@ -100,9 +119,11 @@ function ProductPage() {
         <img
           src={imageUrl}
           alt={product.name}
+          loading="lazy"
           className="object-cover w-full h-64 rounded-xl"
           onError={(e) => {
-            // 🛡 prevent infinite loop
+            console.error("❌ IMAGE LOAD FAILED:", e.currentTarget.src);
+
             if (e.currentTarget.src.includes("placeholder.png")) return;
             e.currentTarget.src = "/placeholder.png";
           }}
@@ -120,7 +141,6 @@ function ProductPage() {
             ₹{product.price}
           </p>
 
-          {/* 🔢 quantity */}
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={decreaseQty}
@@ -139,7 +159,6 @@ function ProductPage() {
             </button>
           </div>
 
-          {/* 🔘 buttons */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={handleAddToCart}
