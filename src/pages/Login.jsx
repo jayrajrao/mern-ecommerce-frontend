@@ -1,18 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../services/auth.service";
-<<<<<<< HEAD
 import { useAuth } from "../context/AuthContext";
-=======
->>>>>>> 214996eb39acd32bb05a118d58ed75eb0955c079
 import toast from "react-hot-toast";
 
 function Login() {
   const navigate = useNavigate();
-<<<<<<< HEAD
-  const { login } = useAuth();   // 👈 NEW
-=======
->>>>>>> 214996eb39acd32bb05a118d58ed75eb0955c079
+  const { login } = useAuth();
 
   const [form, setForm] = useState({
     email: "",
@@ -35,42 +29,25 @@ function Login() {
     try {
       setLoading(true);
 
-<<<<<<< HEAD
       const data = await loginUser(form);
       console.log("LOGIN RESPONSE:", data);
 
       const token = data?.token || data?.data?.token;
-      const user = data?.user || data?.data?.user;   // 👈 NEW
+      const user = data?.user || data?.data?.user;
 
       if (!token || !user) {
         throw new Error("Login response incomplete");
       }
 
-      login(user, token);   // 👈 NEW — AuthContext mein save hoga (localStorage bhi ho jayega)
+      login(user, token);
 
       toast.success("Login successful");
 
-      // 👇 role ke hisaab se redirect
       if (user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
-=======
-const data = await loginUser(form);
-console.log("LOGIN RESPONSE:", data);
-
-const token = data?.token || data?.data?.token;
-
-if (!token) {
-  throw new Error("Token not received");
-}
-
-localStorage.setItem("token", token);
-
-      toast.success("Login successful");
-      navigate("/");
->>>>>>> 214996eb39acd32bb05a118d58ed75eb0955c079
     } catch (err) {
       console.error(err);
 
