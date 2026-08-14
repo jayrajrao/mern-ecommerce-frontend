@@ -6,17 +6,28 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+<<<<<<< HEAD
     "axios": "^1.19.0",
+=======
+    "axios": "^1.13.2",
+>>>>>>> 214996eb39acd32bb05a118d58ed75eb0955c079
     "browser-router": "^0.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.6.0",
+<<<<<<< HEAD
     "react-router-dom": "^6.30.4",
+=======
+    "react-router-dom": "^6.25.1",
+>>>>>>> 214996eb39acd32bb05a118d58ed75eb0955c079
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+<<<<<<< HEAD
     "dev": "react-scripts start",
+=======
+>>>>>>> 214996eb39acd32bb05a118d58ed75eb0955c079
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
