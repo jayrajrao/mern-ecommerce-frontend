@@ -3,13 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { logoutUser } from "../services/auth.service";
 import { api } from "../services/api";
-import toast from "react-hot-toast";
+
 
 function NavBar() {
 const [open, setOpen] = useState(false);
 const [user, setUser] = useState(null);
 
-const { cartItems, clearCart } = useCart();
+const { cartItems } = useCart();
 const navigate = useNavigate();
 
 const token = localStorage.getItem("token");
@@ -25,20 +25,17 @@ return (cartItems || []).reduce(
 const displayCount = cartCount > 99 ? "99+" : cartCount;
 
 useEffect(() => {
-const fetchProfile = async () => {
-try {
-if (!token) return;
-const res = await api.get("/user/profile");
-setUser(res.data?.user || null);
-} catch (err) {
-console.error(err);
-}
-};
+  const fetchProfile = async () => {
+    try {
+      if (!token) return;
+      const res = await api.get("/user/profile");
+      setUser(res.data?.user || null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-```
-fetchProfile();
-```
-
+  fetchProfile();
 }, [token]);
 
 const handleLogout = async () => {
