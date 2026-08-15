@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:3910";
+import { createProduct, getCategories } from "../../services/product.service";
 
 function AddProduct() {
   const navigate = useNavigate();
@@ -24,17 +23,10 @@ function AddProduct() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/categories`, {
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (data.success) {
-          setCategories(data.categories);
-        } else {
-          toast.error("Failed to load categories");
-        }
+        const data = await getCategories();
+        setCategories(data);
       } catch {
-        toast.error("Could not reach server");
+        toast.error("Failed to load categories");
       } finally {
         setLoadingCategories(false);
       }
@@ -85,15 +77,9 @@ function AddProduct() {
       fd.append("category", form.category);
       fd.append("images", imageFile);
 
-      const res = await fetch(`${API_BASE}/api/products`, {
-        method: "POST",
-        credentials: "include", // sends the httpOnly JWT cookie
-        body: fd, // don't set Content-Type manually — browser sets multipart boundary
-      });
+      const data = await createProduct(fd);
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
+      if (!data.success) {
         toast.error(data.message || "Failed to add product");
         return;
       }
@@ -104,8 +90,8 @@ function AddProduct() {
           : "Product submitted — pending admin approval"
       );
       navigate("/vendor/my-products");
-    } catch {
-      toast.error("Something went wrong");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to add product");
     } finally {
       setSubmitting(false);
     }
