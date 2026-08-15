@@ -56,13 +56,14 @@ function App() {
           //   </ProtectedRoute>
           // }
      
+
   path="/vendor/add-product"
   element={
-    <div style={{ padding: 40, background: "white", color: "black" }}>
-      TEST PAGE
-    </div>
+    <ProtectedRoute allowedRoles={["vendor", "admin"]}>
+      <AddProduct />
+    </ProtectedRoute>
   }
-  />
+/>
        
       </Routes>
 
