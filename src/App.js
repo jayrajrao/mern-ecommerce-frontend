@@ -24,6 +24,8 @@ import EditProduct from "./pages/vendor/EditProduct";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
+import AdminCategories from "./pages/admin/AdminCategories";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 function App() {
   return (
@@ -98,6 +100,22 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminProducts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/categories"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminCategories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/orders"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminOrders />
             </ProtectedRoute>
           }
         />
