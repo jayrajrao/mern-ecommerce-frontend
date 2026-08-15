@@ -27,7 +27,6 @@ function AddProduct() {
         const data = await getCategories();
         setCategories(data || []);
       } catch (err) {
-        console.error(err);
         toast.error("Failed to load categories");
       } finally {
         setLoadingCategories(false);
@@ -101,7 +100,6 @@ function AddProduct() {
 
       navigate("/vendor/my-products");
     } catch (err) {
-      console.error(err);
       toast.error(err.response?.data?.message || "Failed to add product");
     } finally {
       setSubmitting(false);
@@ -170,11 +168,7 @@ function AddProduct() {
           ))}
         </select>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-        />
+        <input type="file" accept="image/*" onChange={handleImageChange} />
 
         {preview && (
           <img
@@ -197,4 +191,3 @@ function AddProduct() {
 }
 
 export default AddProduct;
-
