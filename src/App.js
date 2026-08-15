@@ -57,8 +57,12 @@ function App() {
           // }
      
   path="/vendor/add-product"
-  element={<div style={{padding:40, background:"white"}}>TEST PAGE</div>}
-/>
+  element={
+    <div style={{ padding: 40, background: "white", color: "black" }}>
+      TEST PAGE
+    </div>
+  }
+  />
        
       </Routes>
 
