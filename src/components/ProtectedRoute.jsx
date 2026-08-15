@@ -37,7 +37,10 @@ function ProtectedRoute({ children, allowedRoles }) {
   if (allowedRoles && !allowedRoles.includes(payload.role)) {
     return <Navigate to="/" replace />;
   }
-
+console.log("TOKEN:", token);
+console.log("PAYLOAD:", payload);
+console.log("ROLE:", payload?.role);
+console.log("ALLOWED:", allowedRoles);
   return children;
 }
 
