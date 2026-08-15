@@ -47,14 +47,19 @@ function App() {
         />
 
         {/* Add product */}
+        
         <Route
-          path="/vendor/add-product"
-          element={
-            <ProtectedRoute allowedRoles={["vendor", "admin"]}>
-           < AddProduct />
-            </ProtectedRoute>
-          }
-        />
+          // path="/vendor/add-product"
+          // element={
+          //   <ProtectedRoute allowedRoles={["vendor", "admin"]}>
+          //  < AddProduct />
+          //   </ProtectedRoute>
+          // }
+     
+  path="/vendor/add-product"
+  element={<div style={{padding:40, background:"white"}}>TEST PAGE</div>}
+/>
+       
       </Routes>
 
       <Footer />
