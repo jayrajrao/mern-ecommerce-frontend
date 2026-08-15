@@ -41,6 +41,9 @@ console.log("TOKEN:", token);
 console.log("PAYLOAD:", payload);
 console.log("ROLE:", payload?.role);
 console.log("ALLOWED:", allowedRoles);
+console.log("ProtectedRoute payload:", payload);
+console.log("Allowed:", allowedRoles);
+console.log("Includes:", allowedRoles?.includes(payload.role));
   return children;
 }
 
