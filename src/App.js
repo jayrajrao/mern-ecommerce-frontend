@@ -13,6 +13,9 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Footer from "./tailwind/Footer";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import AddProduct from "./pages/vendor/AddProduct";
+
 function App() {
   return (
     <AuthProvider>
@@ -26,6 +29,16 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+
+        {/* Vendor-only */}
+        <Route
+          path="/vendor/add-product"
+          element={
+            <ProtectedRoute allowedRoles={["vendor", "admin"]}>
+              <AddProduct />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       <Footer />

@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { createProduct, getCategories } from "../../services/vendor.service";
+import { useNavigate } from "react-router-dom";
 
-const AddProduct = () => {
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3910";
+
+function AddProduct() {
   const navigate = useNavigate();
+
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -15,19 +17,29 @@ const AddProduct = () => {
     price: "",
     stock: "",
     category: "",
-    images: null,
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const loadCategories = async () => {
       try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        toast.error("Failed to load categories");
+        const res = await fetch(`${API_BASE}/api/categories`, {
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.success) {
+          setCategories(data.categories);
+        } else {
+          toast.error("Failed to load categories");
+        }
+      } catch {
+        toast.error("Could not reach server");
+      } finally {
+        setLoadingCategories(false);
       }
     };
-    fetchCategories();
+    loadCategories();
   }, []);
 
   const handleChange = (e) => {
@@ -35,123 +47,168 @@ const AddProduct = () => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setForm((prev) => ({ ...prev, images: file }));
-    if (file) setImagePreview(URL.createObjectURL(file));
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+
+    setImageFile(file);
+    setPreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.images) {
-      toast.error("Please select an image");
+    if (!form.name || !form.price || !form.category) {
+      toast.error("Name, price and category are required");
+      return;
+    }
+    if (!imageFile) {
+      toast.error("Product image is required");
       return;
     }
 
+    setSubmitting(true);
     try {
-      setLoading(true);
+      const fd = new FormData();
+      fd.append("name", form.name);
+      fd.append("description", form.description);
+      fd.append("price", form.price);
+      fd.append("stock", form.stock || 0);
+      fd.append("category", form.category);
+      fd.append("images", imageFile);
 
-      const formData = new FormData();
-      formData.append("name", form.name);
-      formData.append("description", form.description);
-      formData.append("price", form.price);
-      formData.append("stock", form.stock);
-      formData.append("category", form.category);
-      formData.append("images", form.images);
+      const res = await fetch(`${API_BASE}/api/products`, {
+        method: "POST",
+        credentials: "include", // sends the httpOnly JWT cookie
+        body: fd, // don't set Content-Type manually — browser sets multipart boundary
+      });
 
-      await createProduct(formData);
+      const data = await res.json();
 
-      toast.success("Product submitted for approval");
-      navigate("/vendor");
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Failed to add product");
+      if (!res.ok || !data.success) {
+        toast.error(data.message || "Failed to add product");
+        return;
+      }
+
+      toast.success(
+        data.product?.status === "approved"
+          ? "Product added"
+          : "Product submitted — pending admin approval"
+      );
+      navigate("/vendor/my-products");
+    } catch {
+      toast.error("Something went wrong");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-lg p-8 mx-auto">
-      <h2 className="mb-6 text-2xl font-bold">Add New Product</h2>
+    <div className="max-w-xl px-4 py-8 mx-auto">
+      <h1 className="mb-6 text-2xl font-semibold">Add Product</h1>
 
-      <form onSubmit={handleSubmit} className="p-6 space-y-4 bg-white rounded-lg shadow">
-        <input
-          name="name"
-          placeholder="Product Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          required
-          rows={4}
-          className="w-full p-2 border rounded"
-        />
-
-        <div className="flex gap-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block mb-1 text-sm font-medium">Name</label>
           <input
-            name="price"
-            type="number"
-            placeholder="Price (₹)"
-            value={form.price}
+            type="text"
+            name="name"
+            value={form.name}
             onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md"
             required
-            className="w-full p-2 border rounded"
-          />
-          <input
-            name="stock"
-            type="number"
-            placeholder="Stock"
-            value={form.stock}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
           />
         </div>
 
-        <select
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select Category</option>
-          {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block mb-1 text-sm font-medium">Description</label>
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            rows={4}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block mb-1 text-sm font-medium">Price</label>
+            <input
+              type="number"
+              name="price"
+              min="0"
+              step="0.01"
+              value={form.price}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-md"
+              required
+            />
+          </div>
+          <div>
+            <label className="block mb-1 text-sm font-medium">Stock</label>
+            <input
+              type="number"
+              name="stock"
+              min="0"
+              value={form.stock}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+        </div>
 
         <div>
-          <input type="file" accept="image/*" onChange={handleImageChange} required />
-          {imagePreview && (
+          <label className="block mb-1 text-sm font-medium">Category</label>
+          <select
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md"
+            required
+            disabled={loadingCategories}
+          >
+            <option value="">
+              {loadingCategories ? "Loading..." : "Select a category"}
+            </option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block mb-1 text-sm font-medium">Image</label>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {preview && (
             <img
-              src={imagePreview}
-              alt="preview"
-              className="object-cover w-24 h-24 mt-2 rounded"
+              src={preview}
+              alt="Preview"
+              className="object-cover w-32 h-32 mt-2 border rounded-md"
             />
           )}
         </div>
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full py-2 text-white bg-black rounded hover:bg-gray-800 disabled:opacity-50"
+          disabled={submitting}
+          className="w-full py-2 text-white bg-black rounded-md disabled:opacity-50"
         >
-          {loading ? "Submitting..." : "Submit for Approval"}
+          {submitting ? "Submitting..." : "Add Product"}
         </button>
       </form>
     </div>
   );
-};
+}
 
 export default AddProduct;
