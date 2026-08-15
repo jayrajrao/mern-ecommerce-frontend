@@ -16,9 +16,9 @@ import Footer from "./tailwind/Footer";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Vendor pages
-import VendorDashboard from "./pages/vendor/VendorDashboard";
+
 import AddProduct from "./pages/vendor/AddProduct";
+import VendorDashboard from "./pages/vendor/VendorDashboard";
 
 function App() {
   return (
@@ -40,7 +40,7 @@ function App() {
           path="/vendor/my-products"
           element={
             <ProtectedRoute allowedRoles={["vendor", "admin"]}>
-              <VendorDashboard />
+              <VendorDashboard/>
             </ProtectedRoute>
           }
         />
