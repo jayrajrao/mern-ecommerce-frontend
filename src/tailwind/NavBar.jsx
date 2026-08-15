@@ -3,13 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { logoutUser } from "../services/auth.service";
 import { api } from "../services/api";
-
+import toast from "react-hot-toast";
 
 function NavBar() {
 const [open, setOpen] = useState(false);
 const [user, setUser] = useState(null);
 
-const { cartItems } = useCart();
+const { cartItems, clearCart } = useCart();
 const navigate = useNavigate();
 
 const token = localStorage.getItem("token");
@@ -25,17 +25,20 @@ return (cartItems || []).reduce(
 const displayCount = cartCount > 99 ? "99+" : cartCount;
 
 useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      if (!token) return;
-      const res = await api.get("/user/profile");
-      setUser(res.data?.user || null);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+const fetchProfile = async () => {
+try {
+if (!token) return;
+const res = await api.get("/user/profile");
+setUser(res.data?.user || null);
+} catch (err) {
+console.error(err);
+}
+};
 
-  fetchProfile();
+
+fetchProfile();
+
+
 }, [token]);
 
 const handleLogout = async () => {
@@ -45,26 +48,34 @@ await logoutUser();
 console.error(err);
 }
 
-```
+// ```
+// localStorage.removeItem("token");
+// clearCart?.();
+// setUser(null);
+
+// toast.success("Logged out");
+// navigate("/login");
+// ```
 localStorage.removeItem("token");
 clearCart?.();
 setUser(null);
 
 toast.success("Logged out");
 navigate("/login");
-```
-
 };
 
-return ( <nav className="sticky top-0 z-50 border-b backdrop-blur-md bg-slate-900/90 border-slate-800"> <div className="flex items-center justify-between px-4 py-3 mx-auto max-w-7xl"> <Link
+return ( <nav className="sticky top-0 z-50 border-b backdrop-blur-md bg-slate-900/90 border-slate-800"> <div className="flex items-center justify-between px-4 py-3 mx-auto max-w-7xl">
+{/* Brand */} <Link
        to="/"
        className="text-xl font-extrabold tracking-wide text-white transition hover:opacity-90"
      >
 UrbanDrip </Link>
 
 ```
+    {/* Right side */}
     <div className="flex items-center gap-5">
-      {isLoggedIn && (
+      {/* User orders */}
+      {isLoggedIn && user?.role === "user" && (
         <Link
           to="/orders"
           className="hidden text-sm font-medium text-gray-300 transition sm:block hover:text-white"
@@ -73,7 +84,8 @@ UrbanDrip </Link>
         </Link>
       )}
 
-      {(user?.role === "vendor" || user?.role === "admin") && (
+      {/* Vendor links */}
+      {user?.role === "vendor" && (
         <>
           <Link
             to="/vendor/my-products"
@@ -91,6 +103,17 @@ UrbanDrip </Link>
         </>
       )}
 
+      {/* Admin link */}
+      {user?.role === "admin" && (
+        <Link
+          to="/admin"
+          className="hidden px-3 py-2 text-sm font-medium text-white transition bg-blue-600 rounded-lg sm:block hover:bg-blue-700"
+        >
+          Admin Dashboard
+        </Link>
+      )}
+
+      {/* Cart */}
       <Link
         to="/cart"
         className="relative p-1 text-xl text-white transition hover:scale-110"
@@ -103,11 +126,13 @@ UrbanDrip </Link>
         )}
       </Link>
 
+      {/* Profile / Login */}
       {isLoggedIn ? (
         <div className="flex items-center gap-3">
           <div
             onClick={() => navigate("/profile")}
             className="flex items-center justify-center flex-shrink-0 text-sm font-semibold text-white transition rounded-full cursor-pointer w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+            title={user?.name || "Profile"}
           >
             {user?.name?.charAt(0)?.toUpperCase() || "U"}
           </div>
@@ -128,6 +153,7 @@ UrbanDrip </Link>
         </Link>
       )}
 
+      {/* Mobile menu button */}
       <button
         onClick={() => setOpen(!open)}
         className="p-2 text-white rounded md:hidden hover:bg-slate-800"
@@ -136,6 +162,68 @@ UrbanDrip </Link>
       </button>
     </div>
   </div>
+
+  {/* Mobile menu */}
+  {open && (
+    <div className="px-4 pb-4 border-t md:hidden border-slate-800 bg-slate-900/95 backdrop-blur">
+      <Link
+        to="/"
+        className="block py-2 text-gray-300 hover:text-white"
+        onClick={() => setOpen(false)}
+      >
+        Home
+      </Link>
+
+      {user?.role === "vendor" && (
+        <>
+          <Link
+            to="/vendor/my-products"
+            className="block py-2 text-gray-300 hover:text-white"
+            onClick={() => setOpen(false)}
+          >
+            My Products
+          </Link>
+          <Link
+            to="/vendor/add-product"
+            className="block py-2 text-gray-300 hover:text-white"
+            onClick={() => setOpen(false)}
+          >
+            Add Product
+          </Link>
+        </>
+      )}
+
+      {user?.role === "admin" && (
+        <Link
+          to="/admin"
+          className="block py-2 text-gray-300 hover:text-white"
+          onClick={() => setOpen(false)}
+        >
+          Admin Dashboard
+        </Link>
+      )}
+
+      {isLoggedIn ? (
+        <button
+          onClick={() => {
+            setOpen(false);
+            handleLogout();
+          }}
+          className="block w-full py-2 text-left text-gray-300 hover:text-white"
+        >
+          Logout
+        </button>
+      ) : (
+        <Link
+          to="/login"
+          className="block py-2 text-gray-300 hover:text-white"
+          onClick={() => setOpen(false)}
+        >
+          Login
+        </Link>
+      )}
+    </div>
+  )}
 </nav>
 
 );

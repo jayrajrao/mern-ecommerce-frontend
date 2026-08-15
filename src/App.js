@@ -22,6 +22,9 @@ import VendorDashboard from "./pages/vendor/VendorDashboard";
 import AddProduct from "./pages/vendor/AddProduct";
 import EditProduct from "./pages/vendor/EditProduct";
 
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
+
 function App() {
   return (
     <AuthProvider>
@@ -77,6 +80,24 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["vendor", "admin"]}>
               <EditProduct />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin dashboard */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/products"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminProducts />
             </ProtectedRoute>
           }
         />

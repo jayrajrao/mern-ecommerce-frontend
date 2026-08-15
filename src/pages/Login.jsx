@@ -43,11 +43,14 @@ function Login() {
 
       toast.success("Login successful");
 
-      if (user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+     if (user.role === "admin") {
+navigate("/admin");
+} else if (user.role === "vendor") {
+navigate("/vendor/my-products");
+} else {
+navigate("/");
+}
+
     } catch (err) {
       console.error(err);
 
