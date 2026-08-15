@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { createProduct, getCategories } from "../../services/product.service";
+// import { createProduct, getCategories } from "../../services/product.service";
+import { getCategories, createProduct } from "../../services/vendor.service";
 
 function AddProduct() {
   const navigate = useNavigate();
