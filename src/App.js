@@ -7,13 +7,17 @@ import Home from "./pages/Home";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import Checkout from "./pages/Checkout";
-import NavBar from "./tailwind/NavBar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+
+import NavBar from "./tailwind/NavBar";
 import Footer from "./tailwind/Footer";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+
+// Vendor pages
+import VendorDashboard from "./pages/vendor/VendorDashboard";
 import AddProduct from "./pages/vendor/AddProduct";
 
 function App() {
@@ -22,6 +26,7 @@ function App() {
       <NavBar />
 
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />
@@ -30,7 +35,17 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
 
-        {/* Vendor-only */}
+        {/* Vendor dashboard */}
+        <Route
+          path="/vendor/my-products"
+          element={
+            <ProtectedRoute allowedRoles={["vendor", "admin"]}>
+              <VendorDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Add product */}
         <Route
           path="/vendor/add-product"
           element={
