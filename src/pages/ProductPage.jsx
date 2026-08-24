@@ -21,7 +21,9 @@ function ProductPage() {
       try {
         setLoading(true);
         const data = await getProductById(id);
-        setProduct(data?.product || null);
+        // setProduct(data?.product || null);
+         console.log("🧪 PRODUCT DATA:", data);
+        setProduct(data || null);
       } catch (err) {
         console.error("FETCH PRODUCT ERROR:", err);
         toast.error("Failed to load product");
