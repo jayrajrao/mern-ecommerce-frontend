@@ -45,14 +45,22 @@ function CartPage() {
               className="flex items-center gap-4 p-4 bg-white shadow rounded-xl"
             >
               {/* ✅ image */}
-              <img
-                src={
-                product.images?.url||
-                  "/placeholder.png"
-                }
-                alt={product.name || "Product"}
-                className="object-cover w-20 h-20 rounded"
-              />
+             <img
+  src={
+    Array.isArray(product.images)
+      ? product.images[0]?.url || "/placeholder.png"
+      : product.images?.url || product.images || "/placeholder.png"
+  }
+  alt={product.name || "Product"}
+  className="object-cover w-20 h-20 rounded"
+  onError={(e) => {
+    console.error("CART IMAGE LOAD FAILED:", e.currentTarget.src);
+
+    if (!e.currentTarget.src.includes("placeholder.png")) {
+      e.currentTarget.src = "/placeholder.png";
+    }
+  }}
+/>
 
               {/* ✅ info */}
               <div className="flex-1">
